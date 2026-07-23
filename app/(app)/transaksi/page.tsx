@@ -3,7 +3,7 @@ import { getCategories } from "@/app/actions/category";
 import { TransactionFormDialog } from "@/components/transaction-form-dialog";
 import { TransactionItem } from "@/components/transaction-item";
 import { formatRupiah, formatDate } from "@/lib/format";
-import { TransactionType } from "@prisma/client";
+type TransactionType = "INCOME" | "EXPENSE";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { CategoryFilterDropdown } from "@/components/transaction-filter-category";
