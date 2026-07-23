@@ -67,11 +67,12 @@ export function getPrevPeriod(month: number, year: number): Period {
  * Kalau hari ini >= 24, periode aktif = bulan depan (to-side).
  * Kalau hari ini < 24, periode aktif = bulan ini (to-side).
  */
-export function getCurrentPeriod(): Period {
-  const now = new Date();
-  const day = now.getDate();
-  const month = now.getMonth() + 1; // 1-based
-  const year = now.getFullYear();
+export function getCurrentPeriod(timezoneOffsetHours: number = 7): Period {
+  // Koreksi timezone — server berjalan di UTC, user di WIB (UTC+7)
+  const now = new Date(Date.now() + timezoneOffsetHours * 60 * 60 * 1000);
+  const day = now.getUTCDate();
+  const month = now.getUTCMonth() + 1; // 1-based
+  const year = now.getUTCFullYear();
 
   if (day >= PAYROLL_DAY) {
     // Sudah masuk periode baru: to-side = bulan depan
