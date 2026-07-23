@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getPeriodRange, getCurrentPeriod } from "@/lib/period";
+import { getPeriodRange } from "@/lib/period";
 
 export function MonthSelector({
   month,
@@ -22,8 +22,6 @@ export function MonthSelector({
     router.push(`${basePath}?month=${m}&year=${y}`);
   }
 
-  const current = getCurrentPeriod();
-  const isCurrentPeriod = month === current.month && year === current.year;
   const { label } = getPeriodRange(month, year);
 
   return (
@@ -42,8 +40,7 @@ export function MonthSelector({
 
       <button
         onClick={() => navigate(1)}
-        disabled={isCurrentPeriod}
-        className="w-7 h-7 rounded-lg hover:bg-cream-200 flex items-center justify-center text-warm-500 hover:text-warm-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className="w-7 h-7 rounded-lg hover:bg-cream-200 flex items-center justify-center text-warm-500 hover:text-warm-800 transition-colors"
         aria-label="Periode berikutnya"
       >
         <ChevronRight className="w-4 h-4" />

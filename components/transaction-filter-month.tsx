@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { getPeriodRange, getCurrentPeriod } from "@/lib/period";
+import { getPeriodRange } from "@/lib/period";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
@@ -25,8 +25,6 @@ export function MonthPicker({ month, year }: Props) {
     router.push(buildUrl(d.getMonth() + 1, d.getFullYear()));
   }
 
-  const current = getCurrentPeriod();
-  const isCurrentPeriod = month === current.month && year === current.year;
   const { label } = getPeriodRange(month, year);
 
   return (
@@ -41,8 +39,7 @@ export function MonthPicker({ month, year }: Props) {
       <span className="px-1 text-sm text-warm-600 whitespace-nowrap">{label}</span>
       <button
         onClick={() => navigate(1)}
-        disabled={isCurrentPeriod}
-        className="px-2 h-8 text-warm-400 hover:text-warm-800 hover:bg-cream-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        className="px-2 h-8 text-warm-400 hover:text-warm-800 hover:bg-cream-50 transition-colors"
         aria-label="Periode berikutnya"
       >
         <ChevronRight className="w-3.5 h-3.5" />
