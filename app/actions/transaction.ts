@@ -23,11 +23,35 @@ export type TransactionFormData = {
   categoryId: string;
 };
 
-export type TransactionWithRelations = Awaited<
-  ReturnType<typeof getTransactions>
->[number];
+export type TransactionWithRelations = {
+  id: string;
+  type: TransactionType;
+  amount: number;
+  description: string;
+  date: Date;
+  receiptImageUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  categoryId: string;
+  userId: string;
+  category: {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    type: TransactionType;
+    isDefault: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  user: {
+    id: string;
+    name: string | null;
+    email: string;
+  };
+};
 
-export async function getTransactions(filters?: TransactionFilters) {
+export async function getTransactions(filters?: TransactionFilters): Promise<TransactionWithRelations[]> {
   const where: NonNullable<Parameters<typeof prisma.transaction.findMany>[0]>["where"] = {};
 
   if (filters?.type && filters.type !== "ALL") {
