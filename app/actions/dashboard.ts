@@ -113,6 +113,11 @@ export async function getDashboardSummary(
   };
 }
 
+const MONTH_NAMES_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Ags", "Sep", "Okt", "Nov", "Des",
+];
+
 export async function getMonthlyChart(
   months: number = 6
 ): Promise<MonthlyChartItem[]> {
@@ -135,7 +140,7 @@ export async function getMonthlyChart(
     results.push({
       month: m,
       year: y,
-      label: `${MONTH_NAMES[m - 1]} '${String(y).slice(2)}`,
+      label: `${MONTH_NAMES_SHORT[m - 1]} '${String(y).slice(2)}`,
       income: rows.find((r) => r.type === "INCOME")?._sum.amount ?? 0,
       expense: rows.find((r) => r.type === "EXPENSE")?._sum.amount ?? 0,
     });
