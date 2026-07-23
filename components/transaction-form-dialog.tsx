@@ -263,7 +263,14 @@ export function TransactionFormDialog({
             </Label>
             <Select value={categoryId} onValueChange={(v) => setCategoryId(v ?? "")}>
               <SelectTrigger className="w-full bg-cream-50 border-cream-200 text-warm-800">
-                <SelectValue placeholder="Pilih kategori…" />
+                <SelectValue placeholder="Pilih kategori…">
+                  {categoryId
+                    ? (() => {
+                        const cat = filteredCategories.find((c) => c.id === categoryId);
+                        return cat ? `${cat.icon} ${cat.name}` : "Pilih kategori…";
+                      })()
+                    : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="bg-white border-cream-200 shadow-lg">
                 {filteredCategories.length === 0 ? (
