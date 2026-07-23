@@ -79,15 +79,6 @@ export function UserSummaryCards({ users }: Props) {
                     <p className="text-xs text-warm-300 italic">Alokasi belum di-set</p>
                   )}
                 </div>
-                {/* Net balance badge */}
-                <div className={`text-right shrink-0 px-2.5 py-1 rounded-xl text-xs font-semibold border ${
-                  u.totalIncome - u.totalExpense >= 0
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                    : "bg-red-50 text-red-600 border-red-100"
-                }`}>
-                  {u.totalIncome - u.totalExpense >= 0 ? "+" : ""}
-                  {formatRupiah(u.totalIncome - u.totalExpense)}
-                </div>
               </div>
 
               {/* Income / Expense row */}
