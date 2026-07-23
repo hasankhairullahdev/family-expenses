@@ -161,12 +161,17 @@ export function TransactionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={trigger ? (trigger as React.ReactElement) : <button />}>
+      <DialogTrigger
+        render={trigger
+          ? (trigger as React.ReactElement)
+          : <Button className="bg-maroon-600 hover:bg-maroon-700 text-white border-0 h-9 px-4 gap-2 shadow-sm" />
+        }
+      >
         {!trigger && (
-          <Button className="bg-maroon-600 hover:bg-maroon-700 text-white border-0 h-9 px-4 gap-2 shadow-sm">
+          <>
             <span className="text-base leading-none">+</span>
             Tambah Transaksi
-          </Button>
+          </>
         )}
       </DialogTrigger>
 
