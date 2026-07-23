@@ -41,7 +41,7 @@ export default async function TransaksiPage({
       ? (params.type as TransactionWithRelations["type"])
       : "ALL";
 
-  const [transactions, categories, users] = await Promise.all([
+  const [rawTransactions, categories, users] = await Promise.all([
     getTransactions({
       type: filterType,
       categoryId: params.categoryId || undefined,
@@ -53,6 +53,7 @@ export default async function TransaksiPage({
     getCategories(),
     prisma.user.findMany({ select: { id: true, name: true } }),
   ]);
+  const transactions = rawTransactions as TransactionWithRelations[];
 
   // Summary calculations
   const totalIncome = transactions
