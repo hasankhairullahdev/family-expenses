@@ -1,9 +1,8 @@
-import { getTransactions } from "@/app/actions/transaction";
+import { getTransactions, TransactionWithRelations } from "@/app/actions/transaction";
 import { getCategories } from "@/app/actions/category";
 import { TransactionFormDialog } from "@/components/transaction-form-dialog";
 import { TransactionItem } from "@/components/transaction-item";
 import { formatRupiah, formatDate } from "@/lib/format";
-type TransactionType = "INCOME" | "EXPENSE";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { CategoryFilterDropdown } from "@/components/transaction-filter-category";
@@ -39,7 +38,7 @@ export default async function TransaksiPage({
 
   const filterType =
     params.type === "INCOME" || params.type === "EXPENSE"
-      ? (params.type as TransactionType)
+      ? (params.type as TransactionWithRelations["type"])
       : "ALL";
 
   const [transactions, categories, users] = await Promise.all([
