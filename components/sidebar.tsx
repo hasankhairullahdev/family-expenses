@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ArrowLeftRight, Wallet, Tag } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, Wallet, Tag, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "@/components/user-avatar";
 import { LogoutButton } from "@/components/logout-button";
@@ -11,6 +11,7 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/transaksi", label: "Transaksi", icon: ArrowLeftRight },
   { href: "/anggaran", label: "Anggaran", icon: Wallet },
+  { href: "/laporan", label: "Laporan", icon: BarChart2 },
   { href: "/kategori", label: "Kategori", icon: Tag },
 ];
 

@@ -52,20 +52,42 @@ export type OverBudgetItem = {
   overByPercent: number;
 };
 
+export type CategorySpend = {
+  categoryId: string;
+  categoryName: string;
+  categoryIcon: string;
+  categoryColor: string;
+  amount: number;
+  percentage: number;
+};
+
 export type UserDashboardSummary = {
   userId: string;
   name: string;
-  alloc: number;           // alokasi dari MonthlyBudget (0 = belum di-set)
-  totalExpense: number;    // pengeluaran periode ini
-  totalIncome: number;     // pemasukan periode ini
-  remaining: number;       // alloc - totalExpense (kalau alloc > 0)
-  topCategories: {
-    categoryName: string;
-    categoryIcon: string;
-    categoryColor: string;
-    amount: number;
-    percentage: number;
-  }[];
+  alloc: number;
+  totalExpense: number;
+  totalIncome: number;
+  remaining: number;
+  topCategories: CategorySpend[];     // top 3
+  allCategories: CategorySpend[];     // semua kategori
+};
+
+export type LaporanCategoryRow = {
+  categoryId: string;
+  categoryName: string;
+  categoryIcon: string;
+  categoryColor: string;
+  totalAmount: number;
+  transactionCount: number;
+  percentage: number;
+};
+
+export type LaporanData = {
+  periodLabel: string;
+  totalIncome: number;
+  totalExpense: number;
+  expenseByCategory: LaporanCategoryRow[];
+  incomeByCategory: LaporanCategoryRow[];
 };
 
 // ── Server Actions ────────────────────────────────────────────────────────────
@@ -309,15 +331,13 @@ export async function getUserSummaries(
       spendingByUser.find((r) => r.userId === u.id && r.type === "INCOME")
         ?._sum.amount ?? 0;
 
-    // Top 3 categories for this user
-    const userCatSpend = categorySpendByUser
-      .filter((r) => r.userId === u.id)
-      .slice(0, 3);
+    const userCatSpend = categorySpendByUser.filter((r) => r.userId === u.id);
 
-    const topCategories = userCatSpend.map((r) => {
+    const allCategories: CategorySpend[] = userCatSpend.map((r) => {
       const cat = catMap.get(r.categoryId);
       const amount = r._sum.amount ?? 0;
       return {
+        categoryId: r.categoryId,
         categoryName: cat?.name ?? "Lainnya",
         categoryIcon: cat?.icon ?? "💰",
         categoryColor: cat?.color ?? "#9B1C1C",
@@ -333,7 +353,79 @@ export async function getUserSummaries(
       totalExpense,
       totalIncome,
       remaining: alloc > 0 ? alloc - totalExpense : 0,
-      topCategories,
+      topCategories: allCategories.slice(0, 3),
+      allCategories,
     };
   });
+}
+
+export async function getLaporanData(
+  month: number,
+  year: number
+): Promise<LaporanData> {
+  const { from, to, label: periodLabel } = getPeriodRange(month, year);
+
+  // Total income & expense
+  const totals = await prisma.transaction.groupBy({
+    by: ["type"],
+    where: { date: { gte: from, lte: to } },
+    _sum: { amount: true },
+    _count: { _all: true },
+  });
+  const totalIncome = totals.find((r) => r.type === "INCOME")?._sum.amount ?? 0;
+  const totalExpense = totals.find((r) => r.type === "EXPENSE")?._sum.amount ?? 0;
+
+  // Spending per category
+  const [expenseRows, incomeRows] = await Promise.all([
+    prisma.transaction.groupBy({
+      by: ["categoryId"],
+      where: { type: "EXPENSE", date: { gte: from, lte: to } },
+      _sum: { amount: true },
+      _count: { _all: true },
+      orderBy: { _sum: { amount: "desc" } },
+    }),
+    prisma.transaction.groupBy({
+      by: ["categoryId"],
+      where: { type: "INCOME", date: { gte: from, lte: to } },
+      _sum: { amount: true },
+      _count: { _all: true },
+      orderBy: { _sum: { amount: "desc" } },
+    }),
+  ]);
+
+  const allCatIds = [
+    ...new Set([...expenseRows, ...incomeRows].map((r) => r.categoryId)),
+  ];
+  const categories = await prisma.category.findMany({
+    where: { id: { in: allCatIds } },
+    select: { id: true, name: true, icon: true, color: true },
+  });
+  const catMap = new Map(categories.map((c) => [c.id, c]));
+
+  function mapRows(
+    rows: typeof expenseRows,
+    total: number
+  ): LaporanCategoryRow[] {
+    return rows.map((r) => {
+      const cat = catMap.get(r.categoryId);
+      const amount = r._sum.amount ?? 0;
+      return {
+        categoryId: r.categoryId,
+        categoryName: cat?.name ?? "Lainnya",
+        categoryIcon: cat?.icon ?? "💰",
+        categoryColor: cat?.color ?? "#9B1C1C",
+        totalAmount: amount,
+        transactionCount: r._count._all,
+        percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
+      };
+    });
+  }
+
+  return {
+    periodLabel,
+    totalIncome,
+    totalExpense,
+    expenseByCategory: mapRows(expenseRows, totalExpense),
+    incomeByCategory: mapRows(incomeRows, totalIncome),
+  };
 }
