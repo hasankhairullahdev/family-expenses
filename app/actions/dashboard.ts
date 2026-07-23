@@ -289,7 +289,7 @@ export async function getUserSummaries(
   // Per-user spending grouped by category (for top categories)
   const categorySpendByUser = await prisma.transaction.groupBy({
     by: ["userId", "categoryId"],
-    where: { type: TransactionType.EXPENSE, date: { gte: from, lte: to } },
+    where: { type: "EXPENSE", date: { gte: from, lte: to } },
     _sum: { amount: true },
     orderBy: { _sum: { amount: "desc" } },
   });

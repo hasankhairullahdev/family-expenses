@@ -128,7 +128,7 @@ export async function getBudgetPageData(
   const spentByCategory = await prisma.transaction.groupBy({
     by: ["categoryId"],
     where: {
-      type: TransactionType.EXPENSE,
+      type: "EXPENSE",
       date: { gte: from, lte: to },
     },
     _sum: { amount: true },
@@ -164,7 +164,7 @@ export async function getBudgetPageData(
   const budgetedIds = new Set(budgets.map((b) => b.categoryId));
   const unbudgeted = await prisma.category.findMany({
     where: {
-      type: TransactionType.EXPENSE,
+      type: "EXPENSE",
       id: { notIn: Array.from(budgetedIds) },
     },
     orderBy: { name: "asc" },
@@ -180,7 +180,7 @@ export async function getBudgetPageData(
   const spentByUser = await prisma.transaction.groupBy({
     by: ["userId"],
     where: {
-      type: TransactionType.EXPENSE,
+      type: "EXPENSE",
       date: { gte: from, lte: to },
     },
     _sum: { amount: true },
