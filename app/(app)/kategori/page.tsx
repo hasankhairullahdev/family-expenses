@@ -1,14 +1,17 @@
 import { getCategories } from "@/app/actions/category";
 import { CategoryFormDialog } from "@/components/category-form-dialog";
 import { CategoryCard } from "@/components/category-card";
+import type { TransactionType } from "@prisma/client";
+
+type Category = Awaited<ReturnType<typeof getCategories>>[number];
 
 export const dynamic = "force-dynamic";
 
 export default async function KategoriPage() {
   const categories = await getCategories();
 
-  const expenses = categories.filter((c) => c.type === "EXPENSE");
-  const incomes = categories.filter((c) => c.type === "INCOME");
+  const expenses = categories.filter((c: Category) => c.type === ("EXPENSE" as TransactionType));
+  const incomes = categories.filter((c: Category) => c.type === ("INCOME" as TransactionType));
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
