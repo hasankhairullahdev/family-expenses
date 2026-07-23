@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { TransactionType } from "@prisma/client";
+
+type TransactionType = "INCOME" | "EXPENSE";
 
 export type CategoryFormData = {
   name: string;
@@ -11,10 +12,21 @@ export type CategoryFormData = {
   type: TransactionType;
 };
 
-export async function getCategories() {
+export type CategoryItem = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  type: TransactionType;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export async function getCategories(): Promise<CategoryItem[]> {
   return prisma.category.findMany({
     orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
-  });
+  }) as Promise<CategoryItem[]>;
 }
 
 export async function createCategory(data: CategoryFormData) {

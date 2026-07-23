@@ -1,5 +1,5 @@
 import { getTransactions, TransactionWithRelations } from "@/app/actions/transaction";
-import { getCategories } from "@/app/actions/category";
+import { getCategories, CategoryItem } from "@/app/actions/category";
 import { TransactionFormDialog } from "@/components/transaction-form-dialog";
 import { TransactionItem } from "@/components/transaction-item";
 import { formatRupiah, formatDate } from "@/lib/format";
@@ -41,7 +41,7 @@ export default async function TransaksiPage({
       ? (params.type as TransactionWithRelations["type"])
       : "ALL";
 
-  const [rawTransactions, categories, users] = await Promise.all([
+  const [rawTransactions, rawCategories, rawUsers] = await Promise.all([
     getTransactions({
       type: filterType,
       categoryId: params.categoryId || undefined,
@@ -54,6 +54,8 @@ export default async function TransaksiPage({
     prisma.user.findMany({ select: { id: true, name: true } }),
   ]);
   const transactions = rawTransactions as TransactionWithRelations[];
+  const categories = rawCategories as CategoryItem[];
+  const users = rawUsers as { id: string; name: string | null }[];
 
   // Summary calculations
   const totalIncome = transactions
