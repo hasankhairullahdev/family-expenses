@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TransactionType } from "@prisma/client";
+type TransactionType = "INCOME" | "EXPENSE";
 
 type Category = {
   id: string;

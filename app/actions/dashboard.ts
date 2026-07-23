@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { TransactionType } from "@prisma/client";
+type TransactionType = "INCOME" | "EXPENSE";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

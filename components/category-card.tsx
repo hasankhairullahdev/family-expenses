@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { TransactionType } from "@prisma/client";
+type TransactionType = "INCOME" | "EXPENSE";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CategoryFormDialog } from "@/components/category-form-dialog";
