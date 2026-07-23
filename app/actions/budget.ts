@@ -63,6 +63,15 @@ export async function getMonthlyBudget(
   month: number,
   year: number
 ): Promise<MonthlyBudgetData> {
+  const { from, to } = getPeriodRange(month, year);
+
+  // familyTotal = total pemasukan periode ini (otomatis)
+  const incomeAgg = await prisma.transaction.aggregate({
+    where: { type: "INCOME", date: { gte: from, lte: to } },
+    _sum: { amount: true },
+  });
+  const familyTotal = incomeAgg._sum.amount ?? 0;
+
   const rec = await prisma.monthlyBudget.findUnique({
     where: { month_year: { month, year } },
   });
@@ -70,7 +79,7 @@ export async function getMonthlyBudget(
     id: rec?.id ?? null,
     month,
     year,
-    familyTotal: rec?.familyTotal ?? 0,
+    familyTotal,
     hasanAlloc: rec?.hasanAlloc ?? 0,
     liaAlloc: rec?.liaAlloc ?? 0,
   };
@@ -79,23 +88,22 @@ export async function getMonthlyBudget(
 export async function setMonthlyBudget(
   month: number,
   year: number,
-  familyTotal: number,
   hasanAlloc: number,
   liaAlloc: number
 ): Promise<{ success: boolean; error?: string }> {
-  if (familyTotal < 0 || hasanAlloc < 0 || liaAlloc < 0)
+  if (hasanAlloc < 0 || liaAlloc < 0)
     return { success: false, error: "Nominal tidak boleh negatif." };
 
   try {
     await prisma.monthlyBudget.upsert({
       where: { month_year: { month, year } },
-      update: { familyTotal, hasanAlloc, liaAlloc },
-      create: { month, year, familyTotal, hasanAlloc, liaAlloc },
+      update: { hasanAlloc, liaAlloc },
+      create: { month, year, familyTotal: 0, hasanAlloc, liaAlloc },
     });
     revalidatePath("/anggaran");
     return { success: true };
   } catch {
-    return { success: false, error: "Gagal menyimpan budget." };
+    return { success: false, error: "Gagal menyimpan alokasi." };
   }
 }
 
