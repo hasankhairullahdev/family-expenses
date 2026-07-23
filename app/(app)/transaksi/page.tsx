@@ -194,7 +194,7 @@ export default async function TransaksiPage({
       <SearchBar current={params.search ?? ""} />
 
       {/* Summary bar */}
-      <div className="grid grid-cols-3 gap-3 mb-6 mt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 mt-2">
         <SummaryCard
           label="Pemasukan"
           amount={totalIncome}
