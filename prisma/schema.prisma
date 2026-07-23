@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  name         String
+  icon         String        @default("💰")
+  color        String        @default("#9B1C1C")
+  type         TransactionType
+  isDefault    Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Transaction {
+  id              String          @id @default(cuid())
+  type            TransactionType
+  amount          Float
+  description     String
+  date            DateTime
+  receiptImageUrl String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Budget {
+  id        String   @id @default(cuid())
+  amount    Float
+  month     Int      // 1-12
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  // null = budget keluarga (shared), non-null = budget personal user
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@unique([categoryId, month, year, userId])
+}
+
+// Budget bulanan global keluarga + alokasi per orang
+model MonthlyBudget {
+  id          String   @id @default(cuid())
+  month       Int      // 1-12
+  year        Int
+  familyTotal Float    @default(0)  // total budget keluarga
+  hasanAlloc  Float    @default(0)  // alokasi untuk Hasan
+  liaAlloc    Float    @default(0)  // alokasi untuk Lia
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([month, year])
+}

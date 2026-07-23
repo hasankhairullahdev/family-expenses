@@ -1,26 +1,168 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ── Design Tokens ──────────────────────────────────────────────────────── */
 @theme inline {
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-playfair);
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+
+  /* Maroon Primary Palette */
+  --color-maroon-50:  #fdf2f2;
+  --color-maroon-100: #fce8e8;
+  --color-maroon-200: #f8d0d0;
+  --color-maroon-300: #f0a8a8;
+  --color-maroon-400: #e05252;
+  --color-maroon-500: #c81e1e;
+  --color-maroon-600: #9b1c1c;
+  --color-maroon-700: #7f1d1d;
+  --color-maroon-800: #6b1a1a;
+  --color-maroon-900: #5a1616;
+  --color-maroon-950: #3b0d0d;
+
+  /* Gold Accent */
+  --color-gold-200: #f5e6a3;
+  --color-gold-300: #f0d060;
+  --color-gold-400: #d4af37;
+  --color-gold-500: #b8960c;
+  --color-gold-600: #9a7d0a;
+
+  /* Cream / Warm Neutrals */
+  --color-cream-50:  #fefcf8;
+  --color-cream-100: #fdf8f0;
+  --color-cream-200: #f9f1e4;
+  --color-cream-300: #f2e6d0;
+  --color-cream-400: #e8d5b4;
+  --color-cream-500: #d4b896;
+
+  /* Warm Gray */
+  --color-warm-100: #f7f4f0;
+  --color-warm-200: #ede8e1;
+  --color-warm-300: #d9d0c6;
+  --color-warm-400: #b8ad9e;
+  --color-warm-500: #8c7f6e;
+  --color-warm-600: #6b5f50;
+  --color-warm-700: #4a4038;
+  --color-warm-800: #2e2820;
+  --color-warm-900: #1a1510;
+
+  /* Shadcn token bridge */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm:  calc(var(--radius) * 0.6);
+  --radius-md:  calc(var(--radius) * 0.8);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Light Warm Theme ───────────────────────────────────────────────────── */
+:root {
+  /* Warm cream background */
+  --background: oklch(0.99 0.008 75);
+  --foreground: oklch(0.18 0.02 45);
+
+  /* Card — warm white */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 45);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 45);
+
+  /* Maroon #9B1C1C primary */
+  --primary: oklch(0.37 0.16 20);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Cream secondary */
+  --secondary: oklch(0.96 0.01 75);
+  --secondary-foreground: oklch(0.25 0.02 45);
+
+  --muted: oklch(0.95 0.01 75);
+  --muted-foreground: oklch(0.50 0.02 45);
+
+  /* Gold accent */
+  --accent: oklch(0.74 0.13 85);
+  --accent-foreground: oklch(0.18 0.02 45);
+
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Warm borders */
+  --border: oklch(0.88 0.015 75);
+  --input: oklch(0.92 0.01 75);
+  --ring: oklch(0.37 0.16 20);
+
+  /* Charts */
+  --chart-1: oklch(0.37 0.16 20);
+  --chart-2: oklch(0.74 0.13 85);
+  --chart-3: oklch(0.50 0.12 200);
+  --chart-4: oklch(0.65 0.15 140);
+  --chart-5: oklch(0.55 0.18 310);
+
+  --radius: 0.625rem;
+
+  /* Sidebar — warm white with maroon accent */
+  --sidebar: oklch(0.98 0.005 75);
+  --sidebar-foreground: oklch(0.18 0.02 45);
+  --sidebar-primary: oklch(0.37 0.16 20);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.37 0.16 20 / 8%);
+  --sidebar-accent-foreground: oklch(0.37 0.16 20);
+  --sidebar-border: oklch(0.88 0.015 75);
+  --sidebar-ring: oklch(0.37 0.16 20);
+}
+
+/* ── Base styles ────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, oklch(0.37 0.16 20 / 3%) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, oklch(0.74 0.13 85 / 4%) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), var(--font-sans);
+  }
 }
