@@ -36,7 +36,7 @@ export default async function KategoriPage() {
           <EmptyState label="pengeluaran" />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {expenses.map((cat) => (
+            {expenses.map((cat: (typeof categories)[number]) => (
               <CategoryCard key={cat.id} category={cat} />
             ))}
           </div>
@@ -54,7 +54,7 @@ export default async function KategoriPage() {
           <EmptyState label="pemasukan" />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {incomes.map((cat) => (
+            {incomes.map((cat: (typeof categories)[number]) => (
               <CategoryCard key={cat.id} category={cat} />
             ))}
           </div>
