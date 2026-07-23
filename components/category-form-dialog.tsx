@@ -100,7 +100,7 @@ export function CategoryFormDialog({ category, trigger, onSuccess }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={trigger as React.ReactElement ?? <span />}>
+      <DialogTrigger render={trigger ? (trigger as React.ReactElement) : <button />}>
         {!trigger && (
           <Button className="bg-maroon-600 hover:bg-maroon-700 text-white border-0 h-9 px-4 gap-2 shadow-sm">
             <span className="text-base leading-none">+</span>
