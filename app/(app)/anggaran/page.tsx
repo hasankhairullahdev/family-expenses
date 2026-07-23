@@ -1,4 +1,5 @@
 import { getBudgetPageData } from "@/app/actions/budget";
+import { getCurrentPeriod } from "@/lib/period";
 import { MonthSelector } from "@/components/dashboard/month-selector";
 import { BudgetCard } from "@/components/budget-card";
 import { BudgetCreateButton } from "@/components/budget-create-button";
@@ -13,9 +14,9 @@ interface PageProps {
 
 export default async function AnggaranPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const now = new Date();
-  const month = params.month ? parseInt(params.month) : now.getMonth() + 1;
-  const year = params.year ? parseInt(params.year) : now.getFullYear();
+  const activePeriod = getCurrentPeriod();
+  const month = params.month ? parseInt(params.month) : activePeriod.month;
+  const year = params.year ? parseInt(params.year) : activePeriod.year;
 
   const { monthlyBudget, budgets, unbudgeted, totalBudget, totalSpent, userSummaries } =
     await getBudgetPageData(month, year);

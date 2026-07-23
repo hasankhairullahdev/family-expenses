@@ -1,5 +1,6 @@
 import { getTransactions, TransactionWithRelations } from "@/app/actions/transaction";
 import { getCategories, CategoryItem } from "@/app/actions/category";
+import { getCurrentPeriod, getPeriodRange } from "@/lib/period";
 import { TransactionFormDialog } from "@/components/transaction-form-dialog";
 import { TransactionItem } from "@/components/transaction-item";
 import { formatRupiah, formatDate } from "@/lib/format";
@@ -15,7 +16,8 @@ type SearchParams = {
   type?: string;
   categoryId?: string;
   userId?: string;
-  month?: string; // "YYYY-MM"
+  month?: string;
+  year?: string;
   search?: string;
 };
 
@@ -26,15 +28,13 @@ export default async function TransaksiPage({
 }) {
   const params = await searchParams;
 
-  // Derive date range from month param
-  let dateFrom: string | undefined;
-  let dateTo: string | undefined;
-  if (params.month) {
-    const [year, month] = params.month.split("-").map(Number);
-    dateFrom = `${year}-${String(month).padStart(2, "0")}-01`;
-    const lastDay = new Date(year, month, 0).getDate();
-    dateTo = `${year}-${String(month).padStart(2, "0")}-${lastDay}`;
-  }
+  // Derive period range from month/year params
+  const activePeriod = getCurrentPeriod();
+  const month = params.month ? parseInt(params.month) : activePeriod.month;
+  const year = params.year ? parseInt(params.year) : activePeriod.year;
+  const period = getPeriodRange(month, year);
+  const dateFrom = period.from.toISOString().split("T")[0];
+  const dateTo = period.to.toISOString().split("T")[0];
 
   const filterType =
     params.type === "INCOME" || params.type === "EXPENSE"
@@ -81,7 +81,8 @@ export default async function TransaksiPage({
     if (params.type) p.type = params.type;
     if (params.categoryId) p.categoryId = params.categoryId;
     if (params.userId) p.userId = params.userId;
-    if (params.month) p.month = params.month;
+    p.month = String(month);
+    p.year = String(year);
     if (params.search) p.search = params.search;
     Object.entries(overrides).forEach(([k, v]) => {
       if (v === undefined || v === "") delete p[k];
@@ -90,10 +91,6 @@ export default async function TransaksiPage({
     const qs = new URLSearchParams(p).toString();
     return `/transaksi${qs ? `?${qs}` : ""}`;
   }
-
-  // Current month default for picker
-  const now = new Date();
-  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
   const hasActiveFilter =
     !!params.type || !!params.categoryId || !!params.userId || !!params.month || !!params.search;
@@ -180,7 +177,7 @@ export default async function TransaksiPage({
         />
 
         {/* Month picker — Client Component, reads searchParams itself */}
-        <MonthPicker current={params.month ?? ""} currentMonth={currentMonth} />
+        <MonthPicker month={month} year={year} />
 
         {/* Clear filters */}
         {hasActiveFilter && (

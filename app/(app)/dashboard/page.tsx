@@ -17,6 +17,7 @@ import { OverBudgetBanner } from "@/components/dashboard/over-budget-banner";
 import { MonthSelector } from "@/components/dashboard/month-selector";
 import { UserAvatar } from "@/components/user-avatar";
 import { UserSummaryCards } from "@/components/dashboard/user-summary-cards";
+import { getCurrentPeriod } from "@/lib/period";
 
 export const dynamic = "force-dynamic";
 
@@ -44,13 +45,11 @@ export default async function DashboardPage({
   const userName = session?.user?.name ?? "User";
 
   const params = await searchParams;
-  const now = new Date();
-  const month = Math.min(
-    12,
-    Math.max(1, parseInt(params.month ?? String(now.getMonth() + 1), 10)) || now.getMonth() + 1
-  );
-  const year = parseInt(params.year ?? String(now.getFullYear()), 10) || now.getFullYear();
+  const activePeriod = getCurrentPeriod();
+  const month = Math.min(12, Math.max(1, parseInt(params.month ?? String(activePeriod.month), 10))) || activePeriod.month;
+  const year = parseInt(params.year ?? String(activePeriod.year), 10) || activePeriod.year;
 
+  const now = new Date();
   const hour = now.getHours();
   const greeting =
     hour < 12 ? "Selamat pagi" : hour < 17 ? "Selamat siang" : "Selamat malam";
@@ -76,8 +75,8 @@ export default async function DashboardPage({
             {userName} 👋
           </h1>
           <p className="text-xs text-warm-400 mt-1">
-            Ringkasan keuangan keluarga
-          </p>
+              {summary.periodLabel}
+            </p>
         </div>
         <div className="flex items-center gap-3">
           <MonthSelector month={month} year={year} />

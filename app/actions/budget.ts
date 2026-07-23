@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { getPeriodRange } from "@/lib/period";
 type TransactionType = "INCOME" | "EXPENSE";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -56,14 +57,6 @@ export type BudgetPageData = {
   userSummaries: UserAllocationSummary[];
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function getMonthRange(month: number, year: number) {
-  const from = new Date(year, month - 1, 1, 0, 0, 0, 0);
-  const to = new Date(year, month, 0, 23, 59, 59, 999);
-  return { from, to };
-}
-
 // ── Monthly Budget (global + alokasi) ─────────────────────────────────────────
 
 export async function getMonthlyBudget(
@@ -112,7 +105,7 @@ export async function getBudgetPageData(
   month: number,
   year: number
 ): Promise<BudgetPageData> {
-  const { from, to } = getMonthRange(month, year);
+  const { from, to } = getPeriodRange(month, year);
 
   // 1. Monthly budget global
   const monthlyBudget = await getMonthlyBudget(month, year);
@@ -176,7 +169,7 @@ export async function getBudgetPageData(
     orderBy: { name: "asc" },
   });
 
-  // Spending per user this month
+  // Spending per user this period
   const spentByUser = await prisma.transaction.groupBy({
     by: ["userId"],
     where: {

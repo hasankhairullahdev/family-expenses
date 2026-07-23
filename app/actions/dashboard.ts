@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { getPeriodRange, getPrevPeriod } from "@/lib/period";
 type TransactionType = "INCOME" | "EXPENSE";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -12,6 +13,7 @@ export type DashboardSummary = {
   transactionCount: number;
   prevTotalIncome: number;
   prevTotalExpense: number;
+  periodLabel: string;
 };
 
 export type MonthlyChartItem = {
@@ -54,8 +56,8 @@ export type UserDashboardSummary = {
   userId: string;
   name: string;
   alloc: number;           // alokasi dari MonthlyBudget (0 = belum di-set)
-  totalExpense: number;    // pengeluaran bulan ini
-  totalIncome: number;     // pemasukan bulan ini
+  totalExpense: number;    // pengeluaran periode ini
+  totalIncome: number;     // pemasukan periode ini
   remaining: number;       // alloc - totalExpense (kalau alloc > 0)
   topCategories: {
     categoryName: string;
@@ -66,32 +68,14 @@ export type UserDashboardSummary = {
   }[];
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function getMonthRange(month: number, year: number) {
-  const from = new Date(year, month - 1, 1, 0, 0, 0, 0);
-  const to = new Date(year, month, 0, 23, 59, 59, 999);
-  return { from, to };
-}
-
-const MONTH_NAMES = [
-  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
-  "Jul", "Ags", "Sep", "Okt", "Nov", "Des",
-];
-
 // ── Server Actions ────────────────────────────────────────────────────────────
 
 export async function getDashboardSummary(
   month: number,
   year: number
 ): Promise<DashboardSummary> {
-  const { from, to } = getMonthRange(month, year);
-
-  // Previous month
-  const prevDate = new Date(year, month - 2, 1);
-  const prevMonth = prevDate.getMonth() + 1;
-  const prevYear = prevDate.getFullYear();
-  const { from: prevFrom, to: prevTo } = getMonthRange(prevMonth, prevYear);
+  const { from, to, label: periodLabel } = getPeriodRange(month, year);
+  const { from: prevFrom, to: prevTo } = getPrevPeriod(month, year);
 
   const [current, previous] = await Promise.all([
     prisma.transaction.groupBy({
@@ -125,20 +109,22 @@ export async function getDashboardSummary(
     transactionCount,
     prevTotalIncome,
     prevTotalExpense,
+    periodLabel,
   };
 }
 
 export async function getMonthlyChart(
   months: number = 6
 ): Promise<MonthlyChartItem[]> {
-  const now = new Date();
+  const { getCurrentPeriod } = await import("@/lib/period");
+  const current = getCurrentPeriod();
   const results: MonthlyChartItem[] = [];
 
   for (let i = months - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const d = new Date(current.year, current.month - 1 - i, 1);
     const m = d.getMonth() + 1;
     const y = d.getFullYear();
-    const { from, to } = getMonthRange(m, y);
+    const { from, to } = getPeriodRange(m, y);
 
     const rows = await prisma.transaction.groupBy({
       by: ["type"],
@@ -163,7 +149,7 @@ export async function getCategoryBreakdown(
   year: number,
   type: "EXPENSE" | "INCOME" = "EXPENSE"
 ): Promise<CategoryBreakdownItem[]> {
-  const { from, to } = getMonthRange(month, year);
+  const { from, to } = getPeriodRange(month, year);
 
   const rows = await prisma.transaction.groupBy({
     by: ["categoryId"],
@@ -224,7 +210,7 @@ export async function getOverBudgetAlerts(
   month: number,
   year: number
 ): Promise<OverBudgetItem[]> {
-  const { from, to } = getMonthRange(month, year);
+  const { from, to } = getPeriodRange(month, year);
 
   const budgets = await prisma.budget.findMany({
     where: { month, year },
@@ -266,7 +252,7 @@ export async function getUserSummaries(
   month: number,
   year: number
 ): Promise<UserDashboardSummary[]> {
-  const { from, to } = getMonthRange(month, year);
+  const { from, to } = getPeriodRange(month, year);
 
   // All users
   const users = await prisma.user.findMany({
