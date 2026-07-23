@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { TransactionType } from "@prisma/client";
+type TransactionType = "INCOME" | "EXPENSE";
 
 export type TransactionFilters = {
   type?: TransactionType | "ALL";
