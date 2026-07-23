@@ -36,7 +36,7 @@ export default async function LaporanPage({ searchParams }: PageProps) {
       <p className="text-xs text-warm-400 mb-5 font-medium">Periode: {periodLabel}</p>
 
       {/* Summary row */}
-      <div className="grid grid-cols-3 gap-3 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         <div className="rounded-2xl bg-white border border-cream-200 shadow-sm p-4">
           <p className="text-[10px] text-warm-400 uppercase tracking-wider mb-1">Pemasukan</p>
           <p className="text-lg font-bold text-emerald-600 font-heading">{formatRupiah(totalIncome)}</p>
