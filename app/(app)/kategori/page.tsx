@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 export default async function KategoriPage() {
   const categories = await getCategories();
 
-  const expenses = categories.filter((c) => c.type === "EXPENSE");
-  const incomes = categories.filter((c) => c.type === "INCOME");
+  const expenses = categories.filter((c: (typeof categories)[number]) => c.type === "EXPENSE");
+  const incomes = categories.filter((c: (typeof categories)[number]) => c.type === "INCOME");
 
   return (
     <div className="p-6 md:p-8 max-w-5xl mx-auto">
